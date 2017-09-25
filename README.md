@@ -11,7 +11,7 @@ The Main idea of this project is to provide a beautiful DSL to start a Spring Ap
  
 Application dsl sample : 
 
-````
+```kotlin
 fun main(args: Array<String>) {
     springNettyApp {
         bean { Routes(ref(), ref()) }
@@ -26,7 +26,7 @@ fun main(args: Array<String>) {
         }
     }.startAndAwait()
 }
-````
+```
  
 This project use : 
  - Spring WebFlux Reactive web server and client
