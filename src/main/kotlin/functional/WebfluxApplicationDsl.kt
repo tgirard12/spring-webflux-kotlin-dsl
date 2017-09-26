@@ -6,6 +6,7 @@ import functional.web.view.MustacheViewResolver
 import org.springframework.context.support.BeanDefinitionDsl
 import org.springframework.context.support.GenericApplicationContext
 import org.springframework.context.support.ReloadableResourceBundleMessageSource
+import org.springframework.context.support.beans
 import org.springframework.http.server.reactive.HttpHandler
 import org.springframework.http.server.reactive.ReactorHttpHandlerAdapter
 import org.springframework.web.reactive.function.server.HandlerStrategies
@@ -17,11 +18,18 @@ import reactor.ipc.netty.http.server.HttpServer
 import reactor.ipc.netty.tcp.BlockingNettyContext
 
 
-class SpringApplication {
+class WebfluxApplicationDsl : BeanDefinitionDsl() {
     var port = 8080
-    var beans: BeanDefinitionDsl? = null
+    var routes = mutableListOf<RouterFunction<ServerResponse>>()
 
-    private val messageSource = BeanDefinitionDsl().apply {
+    private val webHandler = beans {
+        bean("webHandler") {
+            RouterFunctions.toWebHandler(
+                    routes.reduce(RouterFunction<ServerResponse>::and),
+                    HandlerStrategies.builder().viewResolver(ref()).build())
+        }
+    }
+    private val messageSource = beans {
         bean("messageSource") {
             ReloadableResourceBundleMessageSource().apply {
                 setBasename("messages")
@@ -34,11 +42,11 @@ class SpringApplication {
     private lateinit var httpHandler: HttpHandler
     private lateinit var server: HttpServer
 
-    private fun initServer(port: Int = this.port) {
-
+    private fun init(port: Int = this.port) {
         val context = GenericApplicationContext().apply {
-            beans?.initialize(this)
+            initialize(this)
             messageSource.initialize(this)
+            webHandler.initialize(this)
             refresh()
         }
         server = HttpServer.create(port)
@@ -46,12 +54,12 @@ class SpringApplication {
     }
 
     fun start(port: Int = this.port) {
-        initServer(port)
+        init(port)
         nettyContext = server.start(ReactorHttpHandlerAdapter(httpHandler))
     }
 
     fun startAndAwait(port: Int = this.port) {
-        initServer(port)
+        init(port)
         server.startAndAwait(ReactorHttpHandlerAdapter(httpHandler), { nettyContext = it })
     }
 
@@ -59,29 +67,29 @@ class SpringApplication {
         nettyContext.shutdown()
     }
 
-}
+    //
 
-fun springNettyApp(f: BeanDefinitionDsl.() -> Unit): SpringApplication =
-        SpringApplication().apply {
-            this.beans = BeanDefinitionDsl().apply(f)
-        }
-
-fun BeanDefinitionDsl.routes(f: BeanDefinitionDsl.BeanDefinitionContext.() -> RouterFunction<ServerResponse>) {
-    bean("webHandler") {
-        RouterFunctions.toWebHandler(f(), HandlerStrategies.builder().viewResolver(ref()).build())
+    fun routes(f: MutableList<RouterFunction<ServerResponse>>.() -> Unit) {
+        routes = mutableListOf<RouterFunction<ServerResponse>>().apply(f)
     }
-}
 
-fun BeanDefinitionDsl.mustacheTemplate(prefix: String = "classpath:/templates/",
-                                       suffix: String = ".mustache",
-                                       f: MustacheViewResolver.() -> Unit) {
-    bean {
-        MustacheResourceTemplateLoader(prefix, suffix).let {
-            MustacheViewResolver(Mustache.compiler().withLoader(it)).apply {
-                setPrefix(prefix)
-                setSuffix(suffix)
-                f()
+    fun addRouter(f: BeanDefinitionDsl.BeanDefinitionContext.() -> RouterFunction<ServerResponse>) {
+        routes.add(f())
+    }
+
+    fun mustacheTemplate(prefix: String = "classpath:/templates/",
+                         suffix: String = ".mustache",
+                         f: MustacheViewResolver.() -> Unit = {}) {
+        bean {
+            MustacheResourceTemplateLoader(prefix, suffix).let {
+                MustacheViewResolver(Mustache.compiler().withLoader(it)).apply {
+                    setPrefix(prefix)
+                    setSuffix(suffix)
+                    f()
+                }
             }
         }
     }
 }
+
+fun webfluxApplication(f: WebfluxApplicationDsl.() -> Unit) = WebfluxApplicationDsl().apply(f)

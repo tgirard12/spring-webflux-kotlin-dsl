@@ -1,16 +1,19 @@
 package functional
 
-import functional.web.Routes
 import functional.web.UserHandler
+import functional.web.router
+import functional.web.staticRouter
+import org.springframework.context.support.beans
 
-val application = springNettyApp {
-    bean { Routes(ref(), ref()) }
-    bean<UserHandler>()
+val application = webfluxApplication {
     routes {
-        ref<Routes>().router()
+        addRouter { router(ref(), ref()) }
+        addRouter { staticRouter() }
     }
-    mustacheTemplate {
+    beans {
+        bean<UserHandler>()
     }
+    mustacheTemplate()
     profile("foo") {
         bean<Foo>()
     }
