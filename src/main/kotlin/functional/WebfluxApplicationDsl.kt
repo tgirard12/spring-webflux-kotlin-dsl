@@ -69,13 +69,17 @@ class WebfluxApplicationDsl : BeanDefinitionDsl() {
 
     //
 
-    fun routes(f: MutableList<RouterFunction<ServerResponse>>.() -> Unit) {
-        routes = mutableListOf<RouterFunction<ServerResponse>>().apply(f)
+    fun routes(f: MutableList<RouterFunction<ServerResponse>>.() -> Unit) = routes.apply(f)
+
+    fun MutableList<RouterFunction<ServerResponse>>.addRouter(router: RouterFunction<ServerResponse>) {
+        this.add(router)
     }
 
-    fun addRouter(f: BeanDefinitionDsl.BeanDefinitionContext.() -> RouterFunction<ServerResponse>) {
-        routes.add(f())
+    fun MutableList<RouterFunction<ServerResponse>>.addRouter(
+            f: BeanDefinitionDsl.BeanDefinitionContext.() -> RouterFunction<ServerResponse>) {
+        this.add(f())
     }
+
 
     fun mustacheTemplate(prefix: String = "classpath:/templates/",
                          suffix: String = ".mustache",

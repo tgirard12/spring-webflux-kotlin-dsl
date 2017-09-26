@@ -8,7 +8,7 @@ import org.springframework.context.support.beans
 val application = webfluxApplication {
     routes {
         addRouter { router(ref(), ref()) }
-        addRouter { staticRouter() }
+        addRouter(staticRouter())
     }
     beans {
         bean<UserHandler>()
