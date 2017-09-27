@@ -1,4 +1,4 @@
-package functional
+package functional.app
 
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
@@ -17,7 +17,7 @@ class IntegrationTests {
 
     @BeforeAll
     fun beforeAll() {
-        application.start(8181)
+        application.run(await = false, port = 8181)
     }
 
     @Test
