@@ -5,19 +5,17 @@ import functional.locale
 import org.springframework.context.MessageSource
 import org.springframework.core.io.ClassPathResource
 import org.springframework.http.MediaType.*
-import org.springframework.web.reactive.function.BodyInserters
 import org.springframework.web.reactive.function.server.RenderingResponse
 import org.springframework.web.reactive.function.server.ServerResponse.ok
 import org.springframework.web.reactive.function.server.router
 import reactor.core.publisher.toMono
 import java.util.*
 
-fun router(userHandler: UserHandler, messageSource: MessageSource) = router {
-    accept(TEXT_HTML).nest {
-        GET("/") { ok().render("index") }
-        GET("/sse") { ok().render("sse") }
-        GET("/users", userHandler::findAllView)
-    }
+fun routerStatic() = router {
+    resources("/**", ClassPathResource("static/"))
+}
+
+fun routerApi(userHandler: UserHandler) = router {
     "/api".nest {
         accept(APPLICATION_JSON).nest {
             GET("/users", userHandler::findAll)
@@ -25,7 +23,14 @@ fun router(userHandler: UserHandler, messageSource: MessageSource) = router {
         accept(TEXT_EVENT_STREAM).nest {
             GET("/users", userHandler::stream)
         }
+    }
+}
 
+fun routerHtml(userHandler: UserHandler, messageSource: MessageSource) = router {
+    accept(TEXT_HTML).nest {
+        GET("/") { ok().render("index") }
+        GET("/sse") { ok().render("sse") }
+        GET("/users", userHandler::findAllView)
     }
     resources("/**", ClassPathResource("static/"))
 }.filter { request, next ->
@@ -39,10 +44,3 @@ private fun attributes(locale: Locale, messageSource: MessageSource) = mutableMa
             val tokens = frag.execute().split("|")
             out.write(messageSource.getMessage(tokens[0], tokens.slice(IntRange(1, tokens.size - 1)).toTypedArray(), locale))
         })
-
-
-fun staticRouter() = router {
-    accept(APPLICATION_JSON).nest {
-        GET("/static") { ok().body(BodyInserters.fromObject("Static Content")) }
-    }
-}
