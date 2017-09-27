@@ -3,17 +3,16 @@ package functional
 import functional.web.UserHandler
 import functional.web.router
 import functional.web.staticRouter
-import org.springframework.context.support.beans
 
 val application = webfluxApplication {
     routes {
-        addRouter { router(ref(), ref()) }
-        addRouter(staticRouter())
+        router { router(ref(), ref()) }
+        router(staticRouter())
     }
-    beans {
-        bean<UserHandler>()
-    }
+    bean<UserHandler>()
+
     mustacheTemplate()
+
     profile("foo") {
         bean<Foo>()
     }
@@ -21,7 +20,7 @@ val application = webfluxApplication {
 
 
 fun main(args: Array<String>) {
-    application.startAndAwait()
+    application.run()
 }
 
 

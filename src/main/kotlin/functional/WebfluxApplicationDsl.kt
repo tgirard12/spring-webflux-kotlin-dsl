@@ -19,14 +19,37 @@ import reactor.ipc.netty.tcp.BlockingNettyContext
 
 
 class WebfluxApplicationDsl : BeanDefinitionDsl() {
-    var port = 8080
-    var routes = mutableListOf<RouterFunction<ServerResponse>>()
 
+    // Configuration
+    private var port = 8080
+    private var hasViewResolver: Boolean = false
+
+    // Netty Server
+    private val context: GenericApplicationContext by lazy {
+        GenericApplicationContext().apply {
+            initialize(this)
+            webHandler.initialize(this)
+            messageSource.initialize(this)
+            routes.initialize(this)
+            refresh()
+        }
+    }
+    private val httpHandler: HttpHandler by lazy { WebHttpHandlerBuilder.applicationContext(context).build() }
+    private val server: HttpServer by lazy { HttpServer.create(port) }
+    private lateinit var nettyContext: BlockingNettyContext
+
+    // Beans
+    private lateinit var routesDsl: RoutesDsl
+    private val routes = beans {
+        bean {
+            routesDsl.merge(this)
+        }
+    }
     private val webHandler = beans {
         bean("webHandler") {
-            RouterFunctions.toWebHandler(
-                    routes.reduce(RouterFunction<ServerResponse>::and),
-                    HandlerStrategies.builder().viewResolver(ref()).build())
+            RouterFunctions.toWebHandler(ref(), HandlerStrategies.builder().apply {
+                if (hasViewResolver) viewResolver(ref())
+            }.build())
         }
     }
     private val messageSource = beans {
@@ -38,53 +61,26 @@ class WebfluxApplicationDsl : BeanDefinitionDsl() {
         }
     }
 
-    private lateinit var nettyContext: BlockingNettyContext
-    private lateinit var httpHandler: HttpHandler
-    private lateinit var server: HttpServer
-
-    private fun init(port: Int = this.port) {
-        val context = GenericApplicationContext().apply {
-            initialize(this)
-            messageSource.initialize(this)
-            webHandler.initialize(this)
-            refresh()
-        }
-        server = HttpServer.create(port)
-        httpHandler = WebHttpHandlerBuilder.applicationContext(context).build()
-    }
-
-    fun start(port: Int = this.port) {
-        init(port)
-        nettyContext = server.start(ReactorHttpHandlerAdapter(httpHandler))
-    }
-
-    fun startAndAwait(port: Int = this.port) {
-        init(port)
-        server.startAndAwait(ReactorHttpHandlerAdapter(httpHandler), { nettyContext = it })
+    fun run(await: Boolean = true, port: Int = this.port) {
+        if (await)
+            server.startAndAwait(ReactorHttpHandlerAdapter(httpHandler), { nettyContext = it })
+        else
+            nettyContext = server.start(ReactorHttpHandlerAdapter(httpHandler))
     }
 
     fun stop() {
         nettyContext.shutdown()
     }
 
-    //
-
-    fun routes(f: MutableList<RouterFunction<ServerResponse>>.() -> Unit) = routes.apply(f)
-
-    fun MutableList<RouterFunction<ServerResponse>>.addRouter(router: RouterFunction<ServerResponse>) {
-        this.add(router)
+    fun routes(f: RoutesDsl.() -> Unit) {
+        routesDsl = RoutesDsl().apply(f)
     }
-
-    fun MutableList<RouterFunction<ServerResponse>>.addRouter(
-            f: BeanDefinitionDsl.BeanDefinitionContext.() -> RouterFunction<ServerResponse>) {
-        this.add(f())
-    }
-
 
     fun mustacheTemplate(prefix: String = "classpath:/templates/",
                          suffix: String = ".mustache",
                          f: MustacheViewResolver.() -> Unit = {}) {
         bean {
+            hasViewResolver = true
             MustacheResourceTemplateLoader(prefix, suffix).let {
                 MustacheViewResolver(Mustache.compiler().withLoader(it)).apply {
                     setPrefix(prefix)
@@ -93,6 +89,21 @@ class WebfluxApplicationDsl : BeanDefinitionDsl() {
                 }
             }
         }
+    }
+
+    class RoutesDsl {
+        private val routes = mutableListOf<BeanDefinitionDsl.BeanDefinitionContext.() -> RouterFunction<ServerResponse>>()
+
+        fun router(router: RouterFunction<ServerResponse>) {
+            routes.add({ router })
+        }
+
+        fun router(f: BeanDefinitionDsl.BeanDefinitionContext.() -> RouterFunction<ServerResponse>) {
+            routes.add(f)
+        }
+
+        fun merge(f: BeanDefinitionDsl.BeanDefinitionContext): RouterFunction<ServerResponse> =
+                routes.map { it.invoke(f) }.reduce(RouterFunction<ServerResponse>::and)
     }
 }
 
