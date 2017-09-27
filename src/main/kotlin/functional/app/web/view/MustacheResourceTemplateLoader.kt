@@ -13,20 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package functional.web.view
+package functional.app.web.view
 
-
-import java.io.InputStreamReader
-import java.io.Reader
 
 import com.samskivert.mustache.Mustache
 import com.samskivert.mustache.Mustache.Compiler
 import com.samskivert.mustache.Mustache.TemplateLoader
-
 import org.springframework.context.ResourceLoaderAware
 import org.springframework.core.io.DefaultResourceLoader
 import org.springframework.core.io.Resource
 import org.springframework.core.io.ResourceLoader
+import java.io.InputStreamReader
+import java.io.Reader
 
 /**
  * Mustache TemplateLoader implementation that uses a prefix, suffix and the Spring

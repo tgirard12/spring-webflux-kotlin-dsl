@@ -14,24 +14,21 @@
  * limitations under the License.
  */
 
-package functional.web.view
-
-import java.io.InputStreamReader
-import java.io.OutputStreamWriter
-import java.io.Reader
-import java.nio.charset.Charset
-import java.util.Locale
-import java.util.Optional
+package functional.app.web.view
 
 import com.samskivert.mustache.Mustache.Compiler
-import reactor.core.publisher.Flux
-import reactor.core.publisher.Mono
-
 import org.springframework.core.io.Resource
 import org.springframework.http.MediaType
 import org.springframework.web.reactive.result.view.AbstractUrlBasedView
 import org.springframework.web.reactive.result.view.View
 import org.springframework.web.server.ServerWebExchange
+import reactor.core.publisher.Flux
+import reactor.core.publisher.Mono
+import java.io.InputStreamReader
+import java.io.OutputStreamWriter
+import java.io.Reader
+import java.nio.charset.Charset
+import java.util.*
 
 /**
  * Spring WebFlux [View] using the Mustache template engine.

@@ -1,4 +1,4 @@
-package functional
+package functional.app
 
 import java.time.LocalDate
 

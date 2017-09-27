@@ -1,10 +1,10 @@
-package functional
+package functional.app
 
-import functional.WebfluxApplicationDsl.Server.TOMCAT
-import functional.web.UserHandler
-import functional.web.routerApi
-import functional.web.routerHtml
-import functional.web.routerStatic
+import functional.app.web.UserHandler
+import functional.app.web.routerApi
+import functional.app.web.routerHtml
+import functional.app.web.routerStatic
+import functional.dsl.webfluxApplication
 
 val application = webfluxApplication(TOMCAT) {
     // group routers

@@ -1,4 +1,4 @@
-package functional
+package functional.app
 
 import org.springframework.web.reactive.function.server.ServerRequest
 import java.time.LocalDate

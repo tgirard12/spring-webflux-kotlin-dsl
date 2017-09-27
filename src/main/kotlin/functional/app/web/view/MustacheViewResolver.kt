@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package functional.web.view
+package functional.app.web.view
 
 import com.samskivert.mustache.Mustache
 import com.samskivert.mustache.Mustache.Compiler

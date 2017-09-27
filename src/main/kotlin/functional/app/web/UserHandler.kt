@@ -1,9 +1,9 @@
-package functional.web
+package functional.app.web
 
-import functional.User
-import functional.formatDate
+import functional.app.User
+import functional.app.formatDate
 import org.springframework.web.reactive.function.server.ServerRequest
-import org.springframework.web.reactive.function.server.ServerResponse.*
+import org.springframework.web.reactive.function.server.ServerResponse.ok
 import org.springframework.web.reactive.function.server.body
 import org.springframework.web.reactive.function.server.bodyToServerSentEvents
 import reactor.core.publisher.Flux
@@ -14,9 +14,9 @@ import java.time.LocalDate
 class UserHandler {
 	
 	private val users = Flux.just(
-			User("Foo", "Foo", LocalDate.now().minusDays(1)),
-			User("Bar", "Bar", LocalDate.now().minusDays(10)),
-			User("Baz", "Baz", LocalDate.now().minusDays(100)))
+            User("Foo", "Foo", LocalDate.now().minusDays(1)),
+            User("Bar", "Bar", LocalDate.now().minusDays(10)),
+            User("Baz", "Baz", LocalDate.now().minusDays(100)))
 	
 	private val userStream = Flux
 			.zip(Flux.interval(Duration.ofMillis(100)), users.repeat())

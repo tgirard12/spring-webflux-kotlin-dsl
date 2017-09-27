@@ -1,7 +1,7 @@
-package functional.web
+package functional.app.web
 
 import com.samskivert.mustache.Mustache
-import functional.locale
+import functional.app.locale
 import org.springframework.context.MessageSource
 import org.springframework.core.io.ClassPathResource
 import org.springframework.http.MediaType.*
