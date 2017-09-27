@@ -1,12 +1,12 @@
 package functional
 
+import functional.WebfluxApplicationDsl.Server.TOMCAT
 import functional.web.UserHandler
 import functional.web.routerApi
 import functional.web.routerHtml
 import functional.web.routerStatic
 
-val application = webfluxApplication {
-
+val application = webfluxApplication(TOMCAT) {
     // group routers
     routes {
         router { routerApi(ref()) }
@@ -17,7 +17,7 @@ val application = webfluxApplication {
     // group beans
     beans {
         bean<UserHandler>()
-        bean<Baz>()
+        bean<Baz>()  // default constructor injection
     }
     bean<Bar>()
 

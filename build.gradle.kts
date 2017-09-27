@@ -54,6 +54,7 @@ dependencies {
 	compile("org.jetbrains.kotlin:kotlin-reflect")
 
 	compile("org.springframework:spring-webflux")
+	compile("org.apache.tomcat.embed:tomcat-embed-core")
     compile("org.springframework:spring-context:5.0.0.BUILD-SNAPSHOT") {
 		exclude(module = "spring-aop")
 	}
