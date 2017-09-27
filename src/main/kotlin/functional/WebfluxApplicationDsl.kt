@@ -6,7 +6,6 @@ import functional.web.view.MustacheViewResolver
 import org.springframework.context.support.BeanDefinitionDsl
 import org.springframework.context.support.GenericApplicationContext
 import org.springframework.context.support.ReloadableResourceBundleMessageSource
-import org.springframework.context.support.beans
 import org.springframework.http.server.reactive.HttpHandler
 import org.springframework.http.server.reactive.ReactorHttpHandlerAdapter
 import org.springframework.web.reactive.function.server.HandlerStrategies
@@ -39,7 +38,8 @@ class WebfluxApplicationDsl : BeanDefinitionDsl() {
     private lateinit var nettyContext: BlockingNettyContext
 
     // Beans
-    private lateinit var routesDsl: RoutesDsl
+    private val beanDsl: BeanDefinitionDsl = BeanDefinitionDsl()
+    private val routesDsl: RoutesDsl = RoutesDsl()
     private val routes = beans {
         bean {
             routesDsl.merge(this)
@@ -72,10 +72,16 @@ class WebfluxApplicationDsl : BeanDefinitionDsl() {
         nettyContext.shutdown()
     }
 
-    fun routes(f: RoutesDsl.() -> Unit) {
-        routesDsl = RoutesDsl().apply(f)
-    }
+    // Routes
+    fun routes(f: RoutesDsl.() -> Unit) = routesDsl.apply(f)
 
+    fun router(router: RouterFunction<ServerResponse>) = routesDsl.router(router)
+    fun router(f: BeanDefinitionDsl.BeanDefinitionContext.() -> RouterFunction<ServerResponse>) = routesDsl.router(f)
+
+    // Beans
+    fun beans(f: BeanDefinitionDsl.() -> Unit) = beanDsl.apply { f() }
+
+    // Mustache
     fun mustacheTemplate(prefix: String = "classpath:/templates/",
                          suffix: String = ".mustache",
                          f: MustacheViewResolver.() -> Unit = {}) {
