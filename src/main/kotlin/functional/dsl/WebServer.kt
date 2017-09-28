@@ -14,7 +14,7 @@ import reactor.ipc.netty.tcp.BlockingNettyContext
 
 
 /**
- * List of supporte server
+ * List of supported server
  */
 enum class Server {
     NETTY, TOMCAT

@@ -7,8 +7,8 @@ import functional.app.web.routerStatic
 import functional.dsl.Server
 import functional.dsl.webfluxApplication
 
-val application = webfluxApplication(Server.NETTY) {
-    // or TOMCAT
+val application = webfluxApplication(Server.NETTY) { // or TOMCAT
+
     // group routers
     routes {
         router { routerApi(ref()) }

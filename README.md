@@ -13,18 +13,28 @@ Application dsl sample :
 
 ```kotlin
 fun main(args: Array<String>) {
-    springNettyApp {
-        bean { Routes(ref(), ref()) }
-        bean<UserHandler>()
+    webfluxApplication(Server.NETTY) { // or TOMCAT
+    
+        // group routers
         routes {
-            ref<Routes>().router()
+            router { routerApi(ref()) }
+            router(routerStatic())
         }
-        mustacheTemplate {
+        router { routerHtml(ref(), ref()) }
+    
+        // group beans
+        beans {
+            bean<UserHandler>()
+            bean<Baz>()  // default constructor injection
         }
+        bean<Bar>()
+    
+        mustacheTemplate()
+    
         profile("foo") {
             bean<Foo>()
         }
-    }.startAndAwait()
+    }
 }
 ```
  
