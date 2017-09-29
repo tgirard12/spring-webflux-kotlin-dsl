@@ -2,7 +2,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
 	application
-    id("org.jetbrains.kotlin.jvm") version "1.1.50"
+    id("org.jetbrains.kotlin.jvm") version "1.1.51"
 	id ("com.github.johnrengelman.plugin-shadow") version "2.0.0"
 	id ("io.spring.dependency-management") version "1.0.3.RELEASE"
 }
@@ -38,7 +38,7 @@ tasks {
 	withType<KotlinCompile> {
 		kotlinOptions {
 			jvmTarget = "1.8"
-			freeCompilerArgs = listOf("-Xjsr305-annotations=enable")
+			freeCompilerArgs = listOf("-Xjsr305=strict")
 		}
 	}
 }
@@ -53,11 +53,11 @@ dependencies {
 	compile("org.jetbrains.kotlin:kotlin-stdlib-jre8")
 	compile("org.jetbrains.kotlin:kotlin-reflect")
 
-	compile("org.springframework:spring-webflux")
-	compile("org.apache.tomcat.embed:tomcat-embed-core")
-    compile("org.springframework:spring-context:5.0.0.BUILD-SNAPSHOT") {
+	compile("org.springframework:spring-webflux:5.0.0.RELEASE")
+    compile("org.springframework:spring-context:5.0.0.RELEASE") {
 		exclude(module = "spring-aop")
 	}
+	compile("org.apache.tomcat.embed:tomcat-embed-core")
 	compile("io.projectreactor.ipc:reactor-netty")
 	compile("com.samskivert:jmustache")
 
