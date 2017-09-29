@@ -34,7 +34,7 @@ fun main(args: Array<String>) {
         profile("foo") {
             bean<Foo>()
         }
-    }
+    }.run()
 }
 ```
  
