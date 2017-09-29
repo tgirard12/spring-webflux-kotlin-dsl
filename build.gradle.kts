@@ -45,7 +45,8 @@ tasks {
 
 dependencyManagement {
 	imports {
-		mavenBom("org.springframework.boot:spring-boot-dependencies:2.0.0.M4")
+        // version BUILD-SNAPSHOT waiting boot-dependencies with spring 5.0.0.RELEASE
+		mavenBom("org.springframework.boot:spring-boot-dependencies:2.0.0.BUILD-SNAPSHOT")
 	}
 }
 
@@ -53,8 +54,8 @@ dependencies {
 	compile("org.jetbrains.kotlin:kotlin-stdlib-jre8")
 	compile("org.jetbrains.kotlin:kotlin-reflect")
 
-	compile("org.springframework:spring-webflux:5.0.0.RELEASE")
-    compile("org.springframework:spring-context:5.0.0.RELEASE") {
+	compile("org.springframework:spring-webflux")
+    compile("org.springframework:spring-context") {
 		exclude(module = "spring-aop")
 	}
 	compile("org.apache.tomcat.embed:tomcat-embed-core")
