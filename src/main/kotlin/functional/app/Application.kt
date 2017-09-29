@@ -19,7 +19,7 @@ val application = webfluxApplication(Server.NETTY) { // or TOMCAT
     // group beans
     beans {
         bean<UserHandler>()
-        bean<Baz>()  // default constructor injection
+        bean<Baz>()  // Primary constructor injection
     }
     bean<Bar>()
 

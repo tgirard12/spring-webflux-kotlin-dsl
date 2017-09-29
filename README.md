@@ -25,7 +25,7 @@ fun main(args: Array<String>) {
         // group beans
         beans {
             bean<UserHandler>()
-            bean<Baz>()  // default constructor injection
+            bean<Baz>()  // Primary constructor injection
         }
         bean<Bar>()
     
