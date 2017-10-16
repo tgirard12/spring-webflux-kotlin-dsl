@@ -9,10 +9,8 @@ plugins {
 
 buildscript {
 	repositories {
-		mavenCentral()
 		jcenter()
-		maven("https://repo.spring.io/milestone")
-		maven("https://repo.spring.io/snapshot")
+		mavenCentral()
 	}
 
 	dependencies {
@@ -25,9 +23,9 @@ apply {
 }
 
 repositories {
+	jcenter()
 	mavenCentral()
 	maven("https://repo.spring.io/milestone")
-	maven("https://repo.spring.io/snapshot")
 }
 
 application {
@@ -45,8 +43,7 @@ tasks {
 
 dependencyManagement {
 	imports {
-        // version BUILD-SNAPSHOT waiting boot-dependencies with spring 5.0.0.RELEASE
-		mavenBom("org.springframework.boot:spring-boot-dependencies:2.0.0.BUILD-SNAPSHOT")
+		mavenBom("org.springframework.boot:spring-boot-dependencies:2.0.0.M5")
 	}
 }
 
